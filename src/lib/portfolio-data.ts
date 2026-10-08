@@ -7,7 +7,6 @@ export type PortfolioShoot = {
   description: string
   coverImage: string
   gallery: string[]
-  colSpan: string
 }
 
 function galleryPaths(slug: string, count: number) {
@@ -25,7 +24,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "A bride at rest before the ceremony, wrapped in red silk and golden light.",
     coverImage: "/images/portfolio/a-portrait-in-red/01.jpg",
     gallery: galleryPaths("a-portrait-in-red", 7),
-    colSpan: "md:col-span-2 md:row-span-2",
   },
   {
     slug: "vows-beneath-the-blooms",
@@ -37,7 +35,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "An intimate mandap ceremony framed by cascading florals and quiet devotion.",
     coverImage: "/images/portfolio/vows-beneath-the-blooms/01.jpg",
     gallery: galleryPaths("vows-beneath-the-blooms", 18),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "wandering-together",
@@ -49,7 +46,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "Two people, hand in hand, exploring sun-washed corridors far from home.",
     coverImage: "/images/portfolio/wandering-together/01.jpg",
     gallery: galleryPaths("wandering-together", 14),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "roots-and-reverence",
@@ -61,7 +57,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "A pre-wedding story told against centuries-old mud architecture and desert light.",
     coverImage: "/images/portfolio/roots-and-reverence/06.jpg",
     gallery: galleryPaths("roots-and-reverence", 27),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "quiet-moments-desert-light",
@@ -73,7 +68,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "Soft silhouettes and stolen glances against the warm tones of the desert.",
     coverImage: "/images/portfolio/quiet-moments-desert-light/08.jpg",
     gallery: galleryPaths("quiet-moments-desert-light", 9),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "at-the-palace-gate",
@@ -85,7 +79,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "Festive colors and fortress walls set the stage for this regal pre-wedding session.",
     coverImage: "/images/portfolio/at-the-palace-gate/09.jpg",
     gallery: galleryPaths("at-the-palace-gate", 14),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "marigolds-and-laughter",
@@ -97,7 +90,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "A joyful, marigold-draped celebration ahead of the big day.",
     coverImage: "/images/portfolio/marigolds-and-laughter/01.jpg",
     gallery: galleryPaths("marigolds-and-laughter", 9),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "henna-and-gold",
@@ -109,7 +101,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "Intricate henna, warm jewel tones, and the quiet anticipation before the vows.",
     coverImage: "/images/portfolio/henna-and-gold/01.jpg",
     gallery: galleryPaths("henna-and-gold", 12),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "sealed-with-joy",
@@ -121,7 +112,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "A candid, laughter-filled moment shared between two people newly promised.",
     coverImage: "/images/portfolio/sealed-with-joy/01.jpg",
     gallery: galleryPaths("sealed-with-joy", 3),
-    colSpan: "md:col-span-1 md:row-span-1",
   },
   {
     slug: "a-getaway-romance",
@@ -133,7 +123,6 @@ export const portfolioShoots: PortfolioShoot[] = [
       "From sunlit garden portraits to a candlelit mandap — a full day of celebration.",
     coverImage: "/images/portfolio/a-getaway-romance/13.jpg",
     gallery: galleryPaths("a-getaway-romance", 27),
-    colSpan: "md:col-span-2 md:row-span-1",
   },
 ]
 

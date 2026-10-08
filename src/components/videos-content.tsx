@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { siteConfig } from "@/lib/site-config"
 import { BokehField } from "@/components/bokeh-field"
 import { FadeImage } from "@/components/fade-image"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 const videos = [
   {
@@ -194,11 +195,18 @@ function VideoCard({
 }) {
   const ref = React.useRef<HTMLButtonElement>(null)
   const [hovering, setHovering] = React.useState(false)
+  const hoverTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   })
   const imgY = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"])
+
+  // The preview streams a multi-MB clip, so wait until the pointer has rested
+  // on the card — sweeping the mouse across the grid shouldn't start a dozen downloads.
+  React.useEffect(() => () => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current)
+  }, [])
 
   return (
     <motion.button
@@ -208,20 +216,25 @@ function VideoCard({
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.7, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       onClick={onPlay}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onMouseEnter={() => {
+        hoverTimer.current = setTimeout(() => setHovering(true), 300)
+      }}
+      onMouseLeave={() => {
+        if (hoverTimer.current) clearTimeout(hoverTimer.current)
+        setHovering(false)
+      }}
       className={cn(
         "group relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer text-left bg-muted",
         className
       )}
     >
-      <motion.div className="absolute inset-[-10%] z-0" style={{ y: imgY }}>
+      <motion.div className="absolute inset-x-0 -inset-y-[7%] z-0" style={{ y: imgY }}>
         <FadeImage
           src={video.poster}
           alt={video.title}
           fill
           className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          sizes={IMAGE_SIZES.poster}
         />
       </motion.div>
 
@@ -240,7 +253,7 @@ function VideoCard({
       <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-80 group-hover:opacity-50 transition-opacity" />
 
       {/* Duration badge */}
-      <span className="absolute top-3 right-3 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold tabular-nums bg-black/50 backdrop-blur-sm text-white border border-white/10">
+      <span className="absolute top-3 right-3 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold tabular-nums bg-black/55 text-white border border-white/10">
         {video.duration}
       </span>
 
@@ -249,7 +262,7 @@ function VideoCard({
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 z-10">
-        <span className="inline-block px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-[0.15em] uppercase mb-2 bg-white/15 backdrop-blur-md text-white border border-white/10">
+        <span className="inline-block px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-[0.15em] uppercase mb-2 bg-black/35 text-white border border-white/15">
           {video.category}
         </span>
         <h3 className="font-heading text-base md:text-lg font-bold text-white leading-tight">
@@ -299,25 +312,22 @@ export function VideosContent() {
       >
         {heroSlides.map((src, i) =>
           loadedSlides.has(i) ? (
-            <motion.div
+            <div
               key={src}
-              className="absolute inset-0 z-0"
-              initial={false}
-              animate={{
-                opacity: i === currentSlide ? 1 : 0,
-                scale: i === currentSlide ? 1.05 : 1,
-              }}
-              transition={{ opacity: { duration: 1.5 }, scale: { duration: 8 } }}
+              className="hero-slide absolute inset-0 z-0"
+              data-active={i === currentSlide}
+              aria-hidden={i !== currentSlide}
             >
               <Image
                 src={src}
                 alt="Behind the scenes of a wedding film"
                 fill
-                priority={i === 0}
+                loading={i === 0 ? "eager" : undefined}
+                fetchPriority={i === 0 ? "high" : undefined}
                 className="object-cover"
-                sizes="100vw"
+                sizes={IMAGE_SIZES.full}
               />
-            </motion.div>
+            </div>
           ) : null
         )}
 
@@ -326,7 +336,7 @@ export function VideosContent() {
 
         <motion.div
           style={{ y: bgY, opacity: heroOpacity }}
-          className="relative z-10 container mx-auto px-6 lg:px-8 w-full flex flex-col items-center justify-center text-center text-white pt-32 pb-20"
+          className="page-shell relative z-10 flex flex-col items-center justify-center text-center text-white pt-32 pb-20"
         >
           <motion.p
             initial={{ opacity: 0, letterSpacing: "0.2em" }}
@@ -366,7 +376,7 @@ export function VideosContent() {
       </section>
 
       {/* Video Grid */}
-      <section className="px-6 lg:px-8 py-24 md:py-32 max-w-[1400px] mx-auto">
+      <section className="page-shell py-24 md:py-32">
         <motion.div {...fadeUp} className="text-center mb-16">
           <p className="text-xs font-medium tracking-[0.3em] uppercase text-primary mb-4">
             The Archive &mdash; {videos.length} Films and Counting
@@ -376,18 +386,16 @@ export function VideosContent() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-7 max-w-4xl mx-auto">
+        {/* Equal posters on one baseline — 3 across (2 on phones). A short last
+            row is centered so the grid mirrors left to right. */}
+        <div className="flex flex-wrap justify-center gap-5 md:gap-7 max-w-4xl mx-auto">
           {videos.map((video, i) => (
             <VideoCard
               key={video.id}
               video={video}
               index={i}
               onPlay={() => setActiveIndex(i)}
-              className={cn(
-                i % 2 === 1 && "mt-10 sm:mt-0",
-                i % 3 === 1 && "md:mt-14",
-                i % 3 === 2 && "md:mt-7"
-              )}
+              className="w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-3.5rem)/3)]"
             />
           ))}
         </div>

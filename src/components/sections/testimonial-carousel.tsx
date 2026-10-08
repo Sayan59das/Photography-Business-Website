@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { FadeImage } from "@/components/fade-image"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 const testimonials = [
   {
@@ -40,6 +42,14 @@ export function TestimonialCarousel() {
   const [current, setCurrent] = React.useState(0)
   const [direction, setDirection] = React.useState(0)
   const timerRef = React.useRef<NodeJS.Timeout | null>(null)
+  // Once the page has settled, quietly fetch the photos for the other slides so
+  // a slide change never reveals an empty panel while a 1MB+ source downloads.
+  const [warm, setWarm] = React.useState(false)
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setWarm(true), 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const resetTimer = React.useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current)
@@ -101,7 +111,7 @@ export function TestimonialCarousel() {
         &ldquo;
       </div>
 
-      <div className="container mx-auto px-6 lg:px-8 relative z-10">
+      <div className="page-shell relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -137,16 +147,36 @@ export function TestimonialCarousel() {
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute inset-0"
                 >
-                  <Image
+                  <FadeImage
                     src={t.imageUrl}
                     alt={t.clientName}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    sizes={IMAGE_SIZES.testimonial}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 </motion.div>
               </AnimatePresence>
+
+              {/* Same URL (same `sizes`) as the visible slide will use, so the
+                  browser cache is hot by the time the slide changes. */}
+              {warm &&
+                testimonials
+                  .filter((other) => other.id !== t.id)
+                  .map((other) => (
+                    <Image
+                      key={other.id}
+                      src={other.imageUrl}
+                      alt=""
+                      aria-hidden
+                      width={600}
+                      height={800}
+                      sizes={IMAGE_SIZES.testimonial}
+                      loading="eager"
+                      fetchPriority="low"
+                      className="hidden"
+                    />
+                  ))}
 
               {/* Gold ring border */}
               <div className="absolute inset-0 rounded-3xl ring-1 ring-primary/20 pointer-events-none" />

@@ -31,7 +31,7 @@ export function ContactContent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <section className="relative overflow-hidden py-24 md:py-32 px-6 lg:px-8 max-w-7xl mx-auto text-center">
+      <section className="page-shell relative overflow-hidden py-24 md:py-32 text-center">
         <BokehField count={10} />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -63,7 +63,7 @@ export function ContactContent() {
         </motion.div>
       </section>
 
-      <section className="px-6 lg:px-8 pb-32 max-w-7xl mx-auto">
+      <section className="page-shell pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
           {/* Contact Form */}

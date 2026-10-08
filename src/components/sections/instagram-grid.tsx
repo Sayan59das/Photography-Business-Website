@@ -18,7 +18,7 @@ const instagramPhotos = [
 export function InstagramGrid() {
   return (
     <section className="py-24 md:py-32 bg-background relative overflow-hidden">
-      <div className="container mx-auto px-6 lg:px-8">
+      <div className="page-shell">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

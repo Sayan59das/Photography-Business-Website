@@ -9,12 +9,22 @@ import { portfolioShoots } from "@/lib/portfolio-data"
 
 const portfolioCategories = ["All", "Wedding", "Pre-Wedding", "Haldi", "Ring-Ceremony", "Portraits"]
 
+/** Reads the active category from the URL. Must sit inside <Suspense>. */
 export function PortfolioContent() {
   const searchParams = useSearchParams()
 
   // Read category from URL, default to "All"
-  const currentCategory = searchParams.get("category")?.toLowerCase() || "all"
+  return <PortfolioView category={searchParams.get("category")?.toLowerCase() || "all"} />
+}
 
+/**
+ * The filter pills + grid for a given category. Split from PortfolioContent so
+ * the server can also render it as the Suspense fallback: `useSearchParams`
+ * makes PortfolioContent client-only, and without a real fallback the HTML
+ * would contain just "Loading…" — no <img> tags, so no photo could start
+ * downloading until the JavaScript bundle had loaded and run.
+ */
+export function PortfolioView({ category: currentCategory }: { category: string }) {
   // Filter the shoots
   const filteredShoots = portfolioShoots.filter(shoot => {
     if (currentCategory === "all") return true
@@ -50,20 +60,27 @@ export function PortfolioContent() {
         })}
       </div>
 
-      {/* Grid */}
-      <section className="px-6 lg:px-8 pb-32 max-w-[1400px] mx-auto min-h-[500px]">
+      {/* Grid — equal tiles, 3 across on desktop / 2 on tablet / 1 on phones.
+          Wrapped flex rows (rather than a CSS grid) so a short last row is
+          centered under the full rows instead of leaving a hole on one side. */}
+      <section className="page-shell pb-32 min-h-[500px]">
         {filteredShoots.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 auto-rows-[300px] md:auto-rows-[400px]">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-5">
             {filteredShoots.map((shoot, i) => (
-              <ParallaxImageCard
+              <div
                 key={shoot.slug}
-                href={`/portfolio/${shoot.slug}`}
-                image={shoot.coverImage}
-                title={shoot.title}
-                category={shoot.category}
-                index={i}
-                className={`${shoot.colSpan} h-full`}
-              />
+                className="w-full sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+              >
+                <ParallaxImageCard
+                  href={`/portfolio/${shoot.slug}`}
+                  image={shoot.coverImage}
+                  title={shoot.title}
+                  category={shoot.category}
+                  index={i}
+                  className="aspect-[4/5] w-full"
+                  eager={i < 3}
+                />
+              </div>
             ))}
           </div>
         ) : (

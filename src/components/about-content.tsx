@@ -10,6 +10,7 @@ import { siteConfig } from "@/lib/site-config"
 import { FadeImage } from "@/components/fade-image"
 import { BokehField } from "@/components/bokeh-field"
 import { AnimatedCounter } from "@/components/animated-counter"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 function QuoteBand() {
   const ref = React.useRef<HTMLElement>(null)
@@ -21,19 +22,19 @@ function QuoteBand() {
 
   return (
     <section ref={ref} className="relative py-32 md:py-40 overflow-hidden">
-      <motion.div className="absolute inset-[-20%] z-0" style={{ y: bgY }}>
+      <motion.div className="absolute inset-x-0 -inset-y-[22%] z-0" style={{ y: bgY }}>
         <FadeImage
           src="/images/stock/about-quote-bg.jpg"
           alt="Behind the scenes at a wedding shoot"
           fill
           className="object-cover"
-          sizes="100vw"
+          sizes={IMAGE_SIZES.full}
         />
       </motion.div>
       <div className="absolute inset-0 z-[1] bg-black/65" />
       <BokehField count={12} className="z-[2]" />
 
-      <div className="relative z-10 container mx-auto px-6 lg:px-8 max-w-4xl text-center">
+      <div className="relative z-10 mx-auto px-6 lg:px-8 max-w-4xl text-center">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -123,7 +124,7 @@ export function AboutContent() {
       </section>
 
       {/* Intro Image & Text */}
-      <section ref={introRef} className="px-6 lg:px-8 pb-24 max-w-7xl mx-auto">
+      <section ref={introRef} className="page-shell pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -133,14 +134,15 @@ export function AboutContent() {
             className="relative"
           >
             <div className="relative h-[500px] md:h-[600px] rounded-3xl overflow-hidden">
-              <motion.div className="absolute inset-[-10%]" style={{ y: imgY }}>
+              <motion.div className="absolute inset-x-0 -inset-y-[10%]" style={{ y: imgY }}>
                 <FadeImage
                   src="/images/stock/about-photographer.jpg"
                   alt="Photographer behind the scenes"
                   fill
-                  priority
+                  loading="eager"
+                  fetchPriority="high"
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes={IMAGE_SIZES.halfTight}
                 />
               </motion.div>
             </div>
@@ -154,7 +156,7 @@ export function AboutContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-6 -right-4 md:-right-8 glass gradient-border rounded-2xl px-6 py-5 shadow-xl"
+              className="absolute -bottom-6 -right-4 lg:-right-8 glass gradient-border rounded-2xl px-6 py-5 shadow-xl"
             >
               <p className="font-heading text-3xl font-bold text-primary leading-none">
                 <AnimatedCounter value={10} suffix="+" />
@@ -204,7 +206,7 @@ export function AboutContent() {
 
       {/* Stats strip */}
       <section className="py-16 border-y border-border/60">
-        <div className="container mx-auto px-6 max-w-5xl">
+        <div className="mx-auto w-full px-6 max-w-5xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
             {stats.map((stat, i) => (
               <motion.div
@@ -231,7 +233,7 @@ export function AboutContent() {
       <section className="py-24 md:py-32 bg-muted/30 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-primary/[0.04] rounded-full blur-3xl pointer-events-none" />
 
-        <div className="container mx-auto px-6 max-w-7xl relative z-10">
+        <div className="page-shell relative z-10">
           <motion.div {...fadeUp} className="text-center mb-16">
             <p className="text-xs font-medium tracking-[0.3em] uppercase text-primary mb-4">
               Our Philosophy

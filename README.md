@@ -20,7 +20,8 @@ A premium, Awwwards-inspired photography studio website built with **Next.js 15*
 - **Page transitions** with Framer Motion `AnimatePresence`
 
 ### 🖼️ Portfolio Showcase
-- **Asymmetric masonry grid** with varied aspect ratios
+- **Symmetrical grids** — equal tiles on one shared page width, with any short last row centered
+- **Smooth image fade-in** — photos fade in over a neutral tile once loaded and decoded (no blur, no pop-in); images are requested at the exact size they're displayed
 - Numbered overlay indices and glassmorphism category pills
 - Hover-reveal CTAs with image zoom
 - Scroll-triggered entrance animations with clip-mask reveals
@@ -52,7 +53,7 @@ A premium, Awwwards-inspired photography studio website built with **Next.js 15*
 | Page / Section | Description |
 |---|---|
 | **Hero** | Full-bleed crossfading image carousel, animated stats counter (500+ Weddings, 10+ Years, 50+ Awards), gold shimmer CTAs |
-| **Selected Works** | Asymmetric masonry portfolio grid with parallax, hover captions, and numbered indices |
+| **Selected Works** | Symmetrical portfolio grid with parallax, hover captions, and numbered indices |
 | **About Teaser** | Split layout with parallax portrait, floating glass stats card, and handwritten signature |
 | **Testimonials** | Editorial split layout — large client photo + serif quote, auto-playing with crossfade transitions |
 | **Instagram Grid** | 6-photo responsive grid with hover overlays and staggered scroll reveal |
@@ -117,6 +118,20 @@ npm run build
 npm start
 ```
 
+### Adding or replacing photos
+
+Drop the files into `public/images/…`, then regenerate the image dimensions
+(without this a new gallery photo assumes a 2:3 shape):
+
+```bash
+npm run images:meta
+```
+
+This rewrites `src/lib/portfolio-image-dims.ts` — commit it with the photos. Use
+`IMAGE_SIZES` from `src/lib/image-sizes.ts` for every new `<Image>`'s `sizes` prop
+(it's matched to the real rendered widths), and the shared `page-shell` class for
+page-width containers so edges line up with the navbar and footer.
+
 ---
 
 ## 📁 Project Structure
@@ -130,7 +145,7 @@ src/
 ├── components/
 │   ├── sections/
 │   │   ├── hero.tsx              # Cinematic hero with crossfade carousel
-│   │   ├── featured-work.tsx     # Asymmetric masonry portfolio
+│   │   ├── featured-work.tsx     # Symmetrical portfolio grid
 │   │   ├── about-teaser.tsx      # About section with parallax portrait
 │   │   ├── testimonial-carousel.tsx  # Editorial split testimonials
 │   │   ├── instagram-grid.tsx    # Social proof photo grid

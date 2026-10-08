@@ -20,7 +20,7 @@ export function Footer() {
       <div className="h-px bg-gradient-to-r from-transparent via-[#C9A24B]/30 to-transparent" />
 
       {/* Main footer */}
-      <div className="container mx-auto px-6 lg:px-8 pt-20 pb-10">
+      <div className="page-shell pt-20 pb-10">
         {/* Top section — Big headline + socials */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
           <motion.div

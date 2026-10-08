@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { siteConfig } from "@/lib/site-config"
 import { FadeImage } from "@/components/fade-image"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 export function AboutTeaser() {
   const ref = React.useRef<HTMLElement>(null)
@@ -20,7 +21,7 @@ export function AboutTeaser() {
       {/* Subtle accent line */}
       <div className="absolute top-0 left-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
 
-      <div className="container mx-auto px-6 lg:px-8">
+      <div className="page-shell">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Image */}
           <motion.div
@@ -31,13 +32,13 @@ export function AboutTeaser() {
             className="relative"
           >
             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
-              <motion.div className="absolute inset-[-10%]" style={{ y: imgY }}>
+              <motion.div className="absolute inset-x-0 -inset-y-[10%]" style={{ y: imgY }}>
                 <FadeImage
                   src="/images/stock/about-photographer.jpg"
                   alt="The photographer"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes={IMAGE_SIZES.half}
                 />
               </motion.div>
             </div>

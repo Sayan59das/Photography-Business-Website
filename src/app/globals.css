@@ -177,26 +177,104 @@
   }
 }
 
+/* One shared page width + gutter. The navbar, footer and every section use it,
+   so left and right edges line up on every screen size (the old mix of
+   `container`, max-w-7xl and max-w-[1400px] made edges drift between sections). */
+@utility page-shell {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+
+  @media (min-width: 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
 /* ===== ANIMATION UTILITIES ===== */
+
+/* Image reveal — a CSS animation rather than a transition, so it can never
+   collide with the `transition-transform` hover zooms callers put on the same
+   element. */
+@keyframes img-reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.img-reveal {
+  animation: img-reveal var(--reveal-ms, 500ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* See-through headline: a translucent white fill with a fine, slightly brighter
+   edge, so the photo shows through the lettering while the letterforms stay crisp.
+   The transparency is carried by the colour (alpha), not by `opacity`, so the
+   word-by-word entrance animation — which animates opacity — is unaffected. */
+.glass-headline {
+  color: rgb(255 255 255 / 0.62);
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.85);
+  /* A soft halo keeps the lettering readable over bright photos. */
+  text-shadow: 0 2px 22px rgb(0 0 0 / 0.45);
+}
+
+/* Hero slideshow — crossfade + slow zoom run entirely on the compositor, so
+   they stay smooth even while the main thread is busy decoding the next photo. */
+.hero-slide {
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 1.5s ease, transform 8s linear;
+  will-change: opacity, transform;
+}
+.hero-slide[data-active="true"] {
+  opacity: 1;
+  transform: scale(1.05);
+}
 
 /* Gold shimmer gradient for buttons / accents */
 @keyframes shimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
+/* Gold buttons: a static gold gradient with a highlight that sweeps across it.
+   The sweep is a pseudo-element moved with `transform`, which the browser runs on
+   the GPU compositor — nothing is repainted. (The old version animated
+   `background-position`, which forces a repaint of the button every frame; with two
+   of them inside the blurred, fixed navbar the whole header was being re-rendered
+   60 times a second, forever.) */
 .gold-shimmer {
+  overflow: hidden;
+  isolation: isolate;
   background: linear-gradient(
     110deg,
     var(--gold-dark) 0%,
-    var(--gold) 20%,
-    var(--gold-light) 40%,
-    var(--gold) 60%,
-    var(--gold-dark) 80%,
-    var(--gold) 100%
+    var(--gold) 28%,
+    var(--gold-light) 50%,
+    var(--gold) 72%,
+    var(--gold-dark) 100%
   );
-  background-size: 200% auto;
-  animation: shimmer 3s linear infinite;
 }
+/* The sheen is positioned against the button itself — unless the host already has
+   its own positioning (e.g. the absolutely placed active-filter pill). */
+.gold-shimmer:where(:not(.absolute, .fixed, .sticky)) {
+  position: relative;
+}
+.gold-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 25%, rgb(255 255 255 / 0.42) 50%, transparent 75%);
+  transform: translateX(-100%);
+  animation: gold-sheen 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+@keyframes gold-sheen {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+/* Gold gradient text: static, and shimmers only while hovered. Animating a
+   text-clipped background repaints the whole heading each frame, so it shouldn't
+   run all the time. */
 .gold-shimmer-text {
   background: linear-gradient(
     110deg,
@@ -207,10 +285,13 @@
     var(--gold-dark) 100%
   );
   background-size: 200% auto;
-  animation: shimmer 3s linear infinite;
+  background-position: 30% center;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+.gold-shimmer-text:hover {
+  animation: shimmer 3s linear infinite;
 }
 
 /* Floating bokeh particle */

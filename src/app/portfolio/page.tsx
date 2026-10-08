@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { Metadata } from "next"
-import { PortfolioContent } from "@/components/portfolio-content"
+import { PortfolioContent, PortfolioView } from "@/components/portfolio-content"
 import { BokehField } from "@/components/bokeh-field"
 import { siteConfig } from "@/lib/site-config"
 
@@ -13,7 +13,7 @@ export default function PortfolioPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <section className="relative overflow-hidden py-24 md:py-36 px-6 lg:px-8 max-w-7xl mx-auto text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <section className="page-shell relative overflow-hidden py-24 md:py-36 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
         <BokehField count={10} />
         <div className="relative z-10">
           <p className="text-xs font-medium tracking-[0.3em] uppercase text-primary mb-4">
@@ -28,7 +28,10 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      <React.Suspense fallback={<div className="min-h-[500px] flex justify-center py-20 text-muted-foreground">Loading portfolio...</div>}>
+      {/* The fallback is the full "All" grid, server-rendered, so the photos start
+          downloading with the page instead of after hydration. Visitors who arrive
+          with ?category=… briefly see it before the filtered grid takes over. */}
+      <React.Suspense fallback={<PortfolioView category="all" />}>
         <PortfolioContent />
       </React.Suspense>
     </div>

@@ -17,6 +17,14 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ]
 
+// Pages whose first screen is a full-bleed photo running underneath the navbar.
+// There the nav sits on a dark image and uses white text; everywhere else it sits
+// on the normal page background and has to use the theme's own text colours —
+// otherwise white-on-cream makes the whole nav invisible in light mode.
+function hasHeroUnderNav(pathname: string) {
+  return pathname === "/" || pathname === "/videos" || pathname.startsWith("/portfolio/")
+}
+
 function isLinkActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href)
 }
@@ -31,6 +39,8 @@ export function Navbar() {
 
   const activeHref = navLinks.find((link) => isLinkActive(pathname, link.href))?.href
   const indicatorHref = hoveredHref ?? activeHref
+  // White text only while the nav is still transparent over a hero photo.
+  const lightText = !isScrolled && hasHeroUnderNav(pathname)
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0
@@ -73,13 +83,13 @@ export function Navbar() {
           : "h-20 bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-6 lg:px-8 h-full flex items-center justify-between">
+      <div className="page-shell h-full flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
           className={cn(
             "font-heading font-bold text-xl md:text-2xl tracking-tight z-50 group",
-            !isScrolled ? "text-white" : "text-foreground"
+            lightText ? "text-white" : "text-foreground"
           )}
         >
           <span className="transition-colors group-hover:text-primary">{siteConfig.shortName}</span>
@@ -109,8 +119,8 @@ export function Navbar() {
                     className={cn(
                       "relative block py-1 transition-colors duration-200",
                       active
-                        ? (!isScrolled ? "text-white" : "text-foreground")
-                        : (!isScrolled ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-foreground")
+                        ? (lightText ? "text-white" : "text-foreground")
+                        : (lightText ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-foreground")
                     )}
                   >
                     {link.label}
@@ -141,7 +151,7 @@ export function Navbar() {
         </nav>
 
         {/* Mobile Toggle */}
-        <div className={cn("flex items-center gap-3 lg:hidden z-50", !isScrolled && "text-white [&_button]:text-white [&_button:hover]:bg-white/10")}>
+        <div className={cn("flex items-center gap-3 lg:hidden z-50", lightText && "text-white [&_button]:text-white [&_button:hover]:bg-white/10")}>
           <Button
             variant="ghost"
             size="icon"

@@ -8,6 +8,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
 import { useIsClient } from "@/lib/use-is-client"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 const heroImages = [
   "/images/hero/architectural-silhouette.jpg",
@@ -106,28 +107,27 @@ export function Hero() {
     >
       {/* Background Images with crossfade — only the current slide and the
           one preloading next are ever mounted, so the browser fetches one
-          hero image at a time instead of all six on first paint. */}
+          hero image at a time instead of all six on first paint. The fade
+          and slow zoom are plain CSS (see .hero-slide), so they run on the
+          compositor and stay smooth while the next photo decodes. */}
       {heroImages.map((src, i) =>
         loaded.has(i) ? (
-          <motion.div
+          <div
             key={src}
-            className="absolute inset-0 z-0"
-            initial={false}
-            animate={{
-              opacity: i === currentImage ? 1 : 0,
-              scale: i === currentImage ? 1.05 : 1,
-            }}
-            transition={{ opacity: { duration: 1.5 }, scale: { duration: 8 } }}
+            className="hero-slide absolute inset-0 z-0"
+            data-active={i === currentImage}
+            aria-hidden={i !== currentImage}
           >
             <Image
               src={src}
               alt="Photography"
               fill
-              priority={i === 0}
+              loading={i === 0 ? "eager" : undefined}
+              fetchPriority={i === 0 ? "high" : undefined}
               className="object-cover"
-              sizes="100vw"
+              sizes={IMAGE_SIZES.full}
             />
-          </motion.div>
+          </div>
         ) : null
       )}
 
@@ -141,7 +141,7 @@ export function Hero() {
       {/* Content */}
       <motion.div
         style={{ y, opacity }}
-        className="relative z-10 container mx-auto px-6 lg:px-8 w-full flex flex-col items-center justify-center text-center text-white pt-32 pb-32"
+        className="page-shell relative z-10 flex flex-col items-center justify-center text-center text-white pt-32 pb-32"
       >
         {/* Eyebrow */}
         <motion.p
@@ -154,7 +154,7 @@ export function Hero() {
         </motion.p>
 
         {/* Headline with word-by-word reveal */}
-        <h1 className="font-heading text-display font-bold tracking-tight mb-8 max-w-5xl text-balance">
+        <h1 className="glass-headline font-heading text-display font-bold tracking-tight mb-8 max-w-5xl text-balance">
           {headlineWords.map((word, i) => (
             <motion.span
               key={i}
@@ -216,40 +216,48 @@ export function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        style={{ opacity }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
-      >
-        <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase">
-          Scroll
-        </span>
-        <div className="scroll-bounce">
-          <ChevronDown className="h-4 w-4 text-white/40" />
-        </div>
-      </motion.div>
+      {/* Bottom controls — one centered stack (scroll cue above the slide dots)
+          so the hero is balanced left and right. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-6 md:bottom-8 z-10 flex flex-col items-center gap-3">
+        <motion.div
+          style={{ opacity }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.5 }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase">
+            Scroll
+          </span>
+          <div className="scroll-bounce">
+            <ChevronDown className="h-4 w-4 text-white/40" />
+          </div>
+        </motion.div>
 
-      {/* Image indicator dots */}
-      <div className="absolute bottom-8 right-8 z-10 flex items-center gap-2">
-        {heroImages.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              currentRef.current = i
-              setCurrentImage(i)
-              setLoaded((current) => (current.has(i) ? current : new Set(current).add(i)))
-            }}
-            className={`transition-all duration-300 rounded-full ${
-              i === currentImage
-                ? "w-8 h-2 bg-primary"
-                : "w-2 h-2 bg-white/30 hover:bg-white/60"
-            }`}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
+        {/* Image indicator dots */}
+        <div className="pointer-events-auto flex items-center">
+          {heroImages.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                currentRef.current = i
+                setCurrentImage(i)
+                setLoaded((current) => (current.has(i) ? current : new Set(current).add(i)))
+              }}
+              className="group/dot flex h-6 w-5 items-center justify-center"
+              aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === currentImage}
+            >
+              <span
+                className={`block rounded-full transition-all duration-300 ${
+                  i === currentImage
+                    ? "w-6 h-2 bg-primary"
+                    : "w-2 h-2 bg-white/30 group-hover/dot:bg-white/60"
+                }`}
+              />
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   )

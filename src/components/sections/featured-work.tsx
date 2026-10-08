@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { ParallaxImageCard } from "@/components/parallax-image-card"
 import { portfolioShoots } from "@/lib/portfolio-data"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 // A curated slice of the real portfolio, kept in sync with
 // src/lib/portfolio-data.ts so this teaser never links to a shoot
@@ -30,13 +31,27 @@ const featuredShoots = featuredSlugs
     href: `/portfolio/${shoot.slug}`,
   }))
 
-const gridStyles = [
-  "md:col-span-2 md:row-span-2 aspect-[4/5]",
-  "aspect-[4/5]",
-  "aspect-[4/5]",
-  "aspect-[4/5]",
-  "aspect-[4/5]",
-  "md:col-span-2 lg:col-span-1 md:aspect-[21/9] lg:aspect-[4/5] aspect-[4/5]",
+// Mixed tile sizes, laid out on a 3-column grid so every edge still lands on the
+// same lines as the navbar and footer and no cell is left empty:
+//   desktop  [ BIG  BIG | small ]   tablet  [   BIG (wide)   ]   phone  one column
+//            [ BIG  BIG | small ]           [ small | small ]
+//            [ small | small | small ]      [ small | small ]
+//                                           [  wide closing tile ]
+// The big tile has no aspect ratio of its own on desktop: it fills the two rows
+// beside it, so its top and bottom match the small tiles exactly.
+const tileLayouts = [
+  {
+    className: "aspect-[4/5] sm:col-span-2 sm:aspect-[16/10] lg:row-span-2 lg:aspect-auto",
+    sizes: IMAGE_SIZES.gridDouble,
+  },
+  { className: "aspect-[4/5]", sizes: IMAGE_SIZES.grid },
+  { className: "aspect-[4/5]", sizes: IMAGE_SIZES.grid },
+  { className: "aspect-[4/5]", sizes: IMAGE_SIZES.grid },
+  { className: "aspect-[4/5]", sizes: IMAGE_SIZES.grid },
+  {
+    className: "aspect-[4/5] sm:col-span-2 sm:aspect-[21/9] lg:col-span-1 lg:aspect-[4/5]",
+    sizes: IMAGE_SIZES.gridWide,
+  },
 ]
 
 export function FeaturedWork() {
@@ -45,7 +60,7 @@ export function FeaturedWork() {
       {/* Background accent */}
       <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-primary/[0.03] to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-6 lg:px-8">
+      <div className="page-shell">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 md:mb-20 gap-6">
           <motion.div
@@ -88,8 +103,8 @@ export function FeaturedWork() {
           </motion.div>
         </div>
 
-        {/* Asymmetric Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+        {/* Mixed-size grid — see tileLayouts above. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {featuredShoots.map((shoot, i) => (
             <ParallaxImageCard
               key={shoot.id}
@@ -98,7 +113,9 @@ export function FeaturedWork() {
               title={shoot.title}
               category={shoot.category}
               index={i}
-              className={gridStyles[i]}
+              className={tileLayouts[i]?.className ?? "aspect-[4/5]"}
+              sizes={tileLayouts[i]?.sizes ?? IMAGE_SIZES.grid}
+              colorOnHover
             />
           ))}
         </div>

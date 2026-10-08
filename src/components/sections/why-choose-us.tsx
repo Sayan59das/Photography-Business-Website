@@ -4,6 +4,7 @@ import * as React from "react"
 import { motion } from "framer-motion"
 import { Heart, Film, Users, Clock, type LucideIcon } from "lucide-react"
 import { FadeImage } from "@/components/fade-image"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 const reasons: { icon: LucideIcon; title: string; desc: string }[] = [
   {
@@ -33,7 +34,7 @@ export function WhyChooseUs() {
     <section className="py-24 md:py-32 bg-muted/20 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-gradient-to-br from-primary/[0.03] to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-6 lg:px-8">
+      <div className="page-shell">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Image */}
           <motion.div
@@ -49,7 +50,7 @@ export function WhyChooseUs() {
                 alt="A couple sharing an intimate embrace"
                 fill
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes={IMAGE_SIZES.half}
               />
             </div>
             <div className="absolute -top-4 -right-4 w-32 h-32 border-r-2 border-t-2 border-primary/20 rounded-tr-3xl pointer-events-none" />

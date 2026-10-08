@@ -1,6 +1,5 @@
 import * as React from "react"
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, ArrowRight, MapPin, CalendarDays } from "lucide-react"
@@ -10,6 +9,7 @@ import { siteConfig } from "@/lib/site-config"
 import { FadeImage } from "@/components/fade-image"
 import { portfolioShoots, getPortfolioShoot } from "@/lib/portfolio-data"
 import { portfolioImageDims } from "@/lib/portfolio-image-dims"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 export async function generateStaticParams() {
   return portfolioShoots.map((shoot) => ({ slug: shoot.slug }))
@@ -41,30 +41,40 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
   return (
     <article className="min-h-screen bg-background">
       {/* Hero Cover */}
-      <section className="relative h-[70vh] md:h-[85vh] w-full">
-        <Image
+      {/* Pulled up under the transparent navbar (-mt-20 cancels <main>'s pt-20), exactly
+          like the home hero, so the nav sits on the photo instead of on an empty strip.
+          The extra 5rem of height keeps the visible cover the same size as before. */}
+      <section className="relative -mt-20 h-[calc(70vh+5rem)] md:h-[calc(85vh+5rem)] w-full">
+        {/* The cover is the first thing seen after clicking a shoot, so it fades in
+            slowly and evenly rather than cutting in. */}
+        <FadeImage
           src={shoot.coverImage}
           alt={shoot.title}
           fill
           className="object-cover"
-          priority
-          sizes="100vw"
+          loading="eager"
+          fetchPriority="high"
+          sizes={IMAGE_SIZES.full}
+          revealMs={800}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
 
         {/* Back button */}
-        <div className="absolute top-24 left-6 lg:left-12 z-20">
-          <Link
-            href="/portfolio"
-            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm font-medium tracking-wider uppercase"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Portfolio
-          </Link>
+        <div className="absolute inset-x-0 top-44 z-20">
+          {/* Same page-shell as the navbar, so this lines up with the logo. */}
+          <div className="page-shell">
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm font-medium tracking-wider uppercase"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Portfolio
+            </Link>
+          </div>
         </div>
 
         {/* Title Overlay */}
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white p-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white p-6 pt-[6.5rem] animate-in fade-in slide-in-from-bottom-6 duration-1000">
           <span className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-[0.2em] uppercase mb-6 bg-white/10 backdrop-blur-md border border-white/20">
             {shoot.category}
           </span>
@@ -93,22 +103,21 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
       </section>
 
       {/* Photo Gallery Grid */}
-      <section className="px-4 md:px-6 lg:px-8 pb-24 max-w-[1600px] mx-auto">
+      <section className="page-shell pb-24">
         <div className="columns-1 md:columns-2 lg:columns-3 gap-4 md:gap-6 space-y-4 md:space-y-6">
           {shoot.gallery.map((src, i) => {
             const dims = portfolioImageDims[src] ?? { width: 800, height: 1200 }
             return (
               <div
-                key={i}
-                className="relative w-full break-inside-avoid rounded-xl overflow-hidden group animate-in fade-in duration-700"
-                style={{ animationDelay: `${(i % 6) * 80}ms`, animationFillMode: "backwards" }}
+                key={src}
+                className="relative w-full break-inside-avoid rounded-xl overflow-hidden group"
               >
                 <FadeImage
                   src={src}
                   alt={`${shoot.title} photo ${i + 1}`}
                   width={dims.width}
                   height={dims.height}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes={IMAGE_SIZES.gallery}
                   className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
@@ -127,7 +136,8 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
           alt={next.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
-          sizes="100vw"
+          sizes={IMAGE_SIZES.full}
+          revealMs={900}
         />
         <div className="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors duration-500" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">

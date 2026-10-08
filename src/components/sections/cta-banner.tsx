@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { FadeImage } from "@/components/fade-image"
 import { BokehField } from "@/components/bokeh-field"
+import { IMAGE_SIZES } from "@/lib/image-sizes"
 
 export function CtaBanner() {
   const ref = React.useRef<HTMLElement>(null)
@@ -22,13 +23,13 @@ export function CtaBanner() {
       className="relative py-24 md:py-32 overflow-hidden"
     >
       {/* Parallax background */}
-      <motion.div className="absolute inset-[-20%] z-0" style={{ y: bgY }}>
+      <motion.div className="absolute inset-x-0 -inset-y-[22%] z-0" style={{ y: bgY }}>
         <FadeImage
           src="/images/stock/cta-bg.jpg"
           alt="Wedding photography"
           fill
           className="object-cover"
-          sizes="100vw"
+          sizes={IMAGE_SIZES.full}
         />
       </motion.div>
 
@@ -43,7 +44,7 @@ export function CtaBanner() {
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent z-[2]" />
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 lg:px-8 text-center">
+      <div className="page-shell relative z-10 text-center">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
